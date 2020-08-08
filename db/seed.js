@@ -16,6 +16,7 @@ const {
     getAllActivities,
     getUser,
     getPublicRoutines,
+    getPublicRoutineByActivity,
     updateRoutine,
 } = require('./index.js')
 
@@ -176,7 +177,7 @@ async function testDB() {
 
         console.log('Calling getUser on users[0]');
         const getUserResult = await getUser({
-            username: 'albert'
+            username: 'sandra'
         });
         console.log('Result:', getUserResult);
 
@@ -216,10 +217,13 @@ async function testDB() {
         console.log('get the public!!!!', publicroute)
 
 
-        // console.log(' get public by the user');
-        // const publicUser = await getAllRoutinesByUser({ username: 'newname' });
-        // console.log('do the damn thing', publicUser);
+        console.log(' get public by the user');
+        const publicUser = await getAllRoutinesByUser({ username: 'newname' });
+        console.log('do the damn thing', publicUser);
 
+        console.log('get routine by activityid');
+        const routineActivity = await getPublicRoutineByActivity({ activityId: 1 });
+        console.log('routineactivityID......', routineActivity)
 
 
         // console.log('get public routines')

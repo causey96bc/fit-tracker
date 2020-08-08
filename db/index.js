@@ -68,7 +68,7 @@ async function updateUser(id, fields = {}) {
     }
 }
 
-async function getUser(username) {
+async function getUser({ username }) {
     try {
         const { rows: [user] } = await client.query(`
             SELECT *
@@ -238,22 +238,45 @@ async function getAllRoutinesByUser({ username }) {
         const { rows: [userId] } = await client.query(`
     SELECT id
     FROM users
-    WHERE username=${username};
+    WHERE username=$1;
     
-    `)
-        console.log('this is the username', username)
+    `, [username])
+        // console.log('this is the username', userId)
+        const id = userId.id
         const { rows: routines } = await client.query(`
     SELECT * 
     FROM routines
-    WHERE "creatorId"= "${userId}";
+    WHERE "creatorId"=$1;
     
-    `)
+    `, [id])
         return routines
     } catch (error) {
         throw error
     }
 }
+async function getPublicRoutineByActivity({ activityId }) {
+    try {
+        const { rows: [activId] } = await client.query(`
+SELECT id
+FROM routine_activities
+WHERE "activityId"=$1
+`, [activityId])
+        const id = activId.id
+        const { rows: routines } = await client.query(`
+SELECT id, public, name, goal
+FROM routines
+WHERE id=$1;
 
+`, [id])
+        return routines
+    } catch (error) {
+        throw error
+    }
+
+
+
+
+}
 
 
 
@@ -402,6 +425,7 @@ module.exports = {
     updateActivity,
     destroyRoutine,
     updateRoutine,
+    getPublicRoutineByActivity,
     getPublicRoutines,
     // getPublicRoutines,
 
