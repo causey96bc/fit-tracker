@@ -1,23 +1,21 @@
 const client = require('./client.js');
-
+const { getAllUsers, createUser, updateUser, getUser } = require('./users.js');
+const { createRoutine, getRoutineById } = require('./routines')
+const { createActivities, createRoutineActivity } = require('./activities')
+const { addActivitiesToRoutine } = require('./routine_activities')
 const {
 
-    getAllUsers,
-    createUser,
-    updateUser,
-    createRoutine,
     getAllRoutines,
-    getRoutineById,
-    createRoutineActivity,
-    createActivities,
+
+    // createRoutineActivity,
+
     getAllRoutinesByUser,
-    addActivitiesToRoutine,
-    getPublicRoutinesByUser,
     updateActivity,
     getAllActivities,
-    getUser,
     getPublicRoutines,
     getPublicRoutineByActivity,
+    updateRoutineActivity,
+    getPublicRoutinesByUser,
     updateRoutine,
 } = require('./index.js')
 
@@ -102,26 +100,31 @@ async function createInitialRoutine() {
         const [albert, sandra, glamgal] = await getAllUsers();
 
         console.log("Starting to create routines...");
-        await createRoutine({
+        const newRoutine = await createRoutine({
             creatorId: albert.id,
             name: "Major Gains",
             goal: 'max weight bench press sets',
-            activities: [{ name: 'benchpress', description: 'sling the dough' }]
+
+
         });
 
-        await createRoutine({
+        const newRoutine2 = await createRoutine({
             creatorId: sandra.id,
             name: "fatBurner",
             goal: '5 mile run in 1 hour',
-            activities: [{ name: 'newname', description: 'new workout' }]
+
         });
 
-        await createRoutine({
+
+        const newRoutine3 = await createRoutine({
             creatorId: glamgal.id,
             name: "gluteus maximus",
             goal: '200 squats a night',
-            activities: [{ name: 'circuit from hell', description: 'just die' }]
         });
+        const activitylist = await createInitialActivities();
+        await addActivitiesToRoutine(newRoutine, activitylist)
+        await addActivitiesToRoutine(newRoutine2, activitylist)
+        await addActivitiesToRoutine(newRoutine3, activitylist)
         console.log("Finished creating routines!");
     } catch (error) {
         console.log("Error creating routiness!");
@@ -142,25 +145,15 @@ async function createInitialActivities() {
             createActivities(object.name, object.description)
         }))
         console.log("finished creating activities")
+        return activity
+
     } catch (error) {
         console.log("error creating activities...")
         throw error
     }
 }
 
-async function rebuildDB() {
-    try {
-        client.connect();
-        await dropTables();
-        await createTables();
-        await createInitialUsers();
-        await createInitialRoutine();
-        await createInitialActivities();
-    } catch (error) {
-        console.log("Error during rebuildDB")
-        throw error;
-    }
-}
+
 
 
 
@@ -188,89 +181,78 @@ async function testDB() {
         });
         console.log("Result:", updateUserResult);
 
-        console.log('Calling getAllRoutines');
-        const routines = await getAllRoutines();
-        console.log('Result:', routines);
+        // console.log('Calling getAllRoutines');
+        // const routines = await getAllRoutines();
+        // console.log('Result:', routines);
 
 
-        console.log('calling getAllActivities');
-        const activities = await getAllActivities();
-        console.log('getting activities', activities[0]);
+        // console.log('calling getAllActivities');
+        // const activities = await getAllActivities();
+        // console.log('getting activities', activities[0]);
 
-        console.log('trying to update activities');
-        const actupdate = await updateActivity(activities[0].id, {
-            name: 'new activity', description: 'this is new'
-        });
-        console.log('will you update?', actupdate);
-
-
-
-        console.log('trying to update routines');
-        const update = await updateRoutine(routines[0].id, {
-            public: true, name: "crunch king", goal: '500 crunches'
-        });
-        console.log('update workout', update)
+        // console.log('trying to update activities');
+        // const actupdate = await updateActivity(activities[0].id, {
+        //     name: 'new activity', description: 'this is new'
+        // });
+        // console.log('will you update?', actupdate);
 
 
 
-        console.log('getting a public routine');
-        const publicroute = await getPublicRoutines()
-        console.log('get the public!!!!', publicroute)
+        // console.log('trying to update routines');
+        // const update = await updateRoutine(routines[0].id, {
+        //     public: true, name: "crunch king", goal: '500 crunches'
+        // });
+        // console.log('update workout', update)
 
 
-        console.log(' get public by the user');
-        const publicUser = await getAllRoutinesByUser({ username: 'newname' });
-        console.log('do the damn thing', publicUser);
 
-        console.log('get routine by activityid');
-        const routineActivity = await getPublicRoutineByActivity({ activityId: 1 });
-        console.log('routineactivityID......', routineActivity)
+        // console.log('getting a public routine');
+        // const publicroute = await getPublicRoutines()
+        // console.log('get the public!!!!', publicroute)
+
+
+        // console.log(' get public by the user');
+        // const publicUser = await getAllRoutinesByUser({ username: 'newname' });
+        // console.log('do the damn thing', publicUser);
+
+        // console.log('get routine by activityid');
+        // const routineActivity = await getPublicRoutineByActivity({ activityId: 1 });
+        // console.log('routineactivityID......', routineActivity)
 
 
         // console.log('get public routines')
         // const publicroutine = await getPublicRoutines()
         // console.log('public routine????', publicroutine)
-        console.log('Calling getPublicRoutinesByUser on routines[0]');
-        const getPublicRoutinesByUserResult = await getPublicRoutinesByUser({
-            username: 'newname'
-        });
-        console.log('Result:', getPublicRoutinesByUserResult);
 
-        // console.log("Calling updateRoutine on routines[1], only updating activities");
-        // const updateRoutineActivitiesResult = await updateRoutine(routine[0].id, {
-        //     activities: [
-        //         { name: 'go', description: 'Go for it.' },
-        //         { name: 'do', description: 'Just do it.' },
-        //         { name: 'be', description: 'Be one with the force.' }
-        //     ]
-        // });
+
+
+
+        // const updateRoutineActivitiesResult = await updateRoutineActivity(1, { count: 30, duration: 30 })
         // console.log("Result:", updateRoutineActivitiesResult);
-        //  console.log("Result:", updateRoutineActivitiesResult);
-        //  console.log('Calling getUserById with 1');
-        //  const albert = await getUserById(1);
-        //  console.log('Result:', johndoe);
-        //  console.log('Finished database tests!');
-        //  console.log("Calling getRoutinesByActivityName with stop");
-        //  const postsWithStop = await getRoutinesByActivityName("stop");
-        //  console.log("Result:", postsWithStop);
+
+        // console.log('Calling getPublicRoutinesByUser on routines[0]');
+        // const getPublicRoutinesByUserResult = await getPublicRoutinesByUser({
+        //     username: 'newname'
+        // });
+        // console.log('Result:', getPublicRoutinesByUserResult);
     } catch (error) {
         console.log("Error during testDB");
         throw error;
     }
 }
-// async function rebuildDB() {
-//     try {
-//         client.connect();
-//         await dropTables();
-//         await createTables();
-//         await createInitialUsers();
-//         await createInitialRoutine();
-//         await createInitialActivities();
-//     } catch (error) {
-//         console.log("Error during rebuildDB")
-//         throw error;
-//     }
-// }
+async function rebuildDB() {
+    try {
+        client.connect();
+        await dropTables();
+        await createTables();
+        await createInitialUsers();
+        await createInitialRoutine();
+        await createInitialActivities();
+    } catch (error) {
+        console.log("Error during rebuildDB")
+        throw error;
+    }
+}
 
 
 rebuildDB()

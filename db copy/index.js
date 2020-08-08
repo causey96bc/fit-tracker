@@ -1,103 +1,33 @@
 
 const client = require('./client.js')
-//
-//
-//
-//USERS
-async function createUser({
-    username,
-    password,
-}) {
-    try {
-        const { rows: user } = await client.query(`
-      INSERT INTO users (username, password) 
-      VALUES($1, $2) 
-      ON CONFLICT (username) DO NOTHING 
-      RETURNING *;
-    `, [username, password]);
 
-        return user;
-    } catch (error) {
-        throw error;
-    }
-}
-async function getAllUsers() {
-    // grabs all the users from the database
-    try {
-        const { rows: user } = await client.query(`
-      SELECT id, username
-      FROM users;
-    `);
-
-        return user;
-    } catch (error) {
-        throw error;
-    }
-}
-async function updateUser(id, fields = {}) {
-
-    const setString = Object.keys(fields).map(
-        (key, index) => `"${key}"=$${index + 1}`
-    ).join(', ');
-
-    if (setString.length === 0) {
-        return;
-    }
-
-    try {
-        const { rows: [user] } = await client.query(`
-      UPDATE users
-      SET ${ setString}
-      WHERE id=${ id}
-      RETURNING *;
-    `, Object.values(fields));
-
-        return user;
-    } catch (error) {
-        throw error;
-    }
-}
-
-async function getUser({ username }) {
-    try {
-        const { rows: [user] } = await client.query(`
-            SELECT *
-            FROM users
-            WHERE username=$1
-        `, [username]);
-        return user;
-    } catch (error) {
-        throw error;
-    }
-}
-//
 //Routines
 //
 //
 //
-async function createRoutine({
-    creatorId,
-    name,
-    goal,
-    activities = []
-}) {
-    //await createActivities(name);
-    try {
-        //deconstructs the rows into post creates a query that will inside the values into the database.
-        const { rows: [routine] } = await client.query(`
-      INSERT INTO routines("creatorId", name, goal) 
-      VALUES($1, $2, $3)
-      RETURNING *;
-    `, [creatorId, name, goal]);
-        //updates the tags defined in create tags it also will assign a tag Id to a post. 
-        const activityList = await Promise.all(activities.map(activity => {
-            return createActivities(activity.name, activity.description);
-        }));
-        return await addActivitiesToRoutine(routine.id, activityList);
-    } catch (error) {
-        throw error;
-    }
-}
+// async function createRoutine({
+//     creatorId,
+//     name,
+//     goal,
+//     activities = []
+// }) {
+//     //await createActivities(name);
+//     try {
+//         //deconstructs the rows into post creates a query that will inside the values into the database.
+//         const { rows: [routine] } = await client.query(`
+//       INSERT INTO routines("creatorId", name, goal) 
+//       VALUES($1, $2, $3)
+//       RETURNING *;
+//     `, [creatorId, name, goal]);
+//         //updates the tags defined in create tags it also will assign a tag Id to a post. 
+//         const activityList = await Promise.all(activities.map(activity => {
+//             return createActivities(activity.name, activity.description);
+//         }));
+//         return await addActivitiesToRoutine(routine.id, activityList);
+//     } catch (error) {
+//         throw error;
+//     }
+// }
 
 async function getAllRoutines() {
     try {
@@ -115,43 +45,43 @@ async function getAllRoutines() {
         throw error;
     }
 }
-async function getRoutineById(routineId) {
-    try {
-        const { rows: [routine] } = await client.query(`
-        SELECT *
-        FROM routines
-        WHERE id=$1;
-      `, [routineId]);
-        if (!routine) {
-            throw {
-                name: 'postNotFound error',
-                message: 'could not find a post with that postId'
-            }
-        }
-        console.log('routine work...', routine)
-        const { rows: [activities] } = await client.query(`
-        SELECT *
-        FROM activities
-        JOIN routine_activities ON activities.id=routine_activities."activityId"
-        WHERE routine_activities."routineId"=$1;
-      `, [routineId])
-        console.log('please work....', activities);
-        const { rows: [creator] } = await client.query(`
-        SELECT id, username
-        FROM users
-        WHERE id=$1;
-      `, [routine.creatorId])
+// async function getRoutineById(routineId) {
+//     try {
+//         const { rows: [routine] } = await client.query(`
+//         SELECT *
+//         FROM routines
+//         WHERE id=$1;
+//       `, [routineId]);
+//         if (!routine) {
+//             throw {
+//                 name: 'postNotFound error',
+//                 message: 'could not find a post with that postId'
+//             }
+//         }
+//         console.log('routine work...', routine)
+//         const { rows: [activities] } = await client.query(`
+//         SELECT *
+//         FROM activities
+//         JOIN routine_activities ON activities.id=routine_activities."activityId"
+//         WHERE routine_activities."routineId"=$1;
+//       `, [routineId])
+//         console.log('please work....', activities);
+//         const { rows: [creator] } = await client.query(`
+//         SELECT id, username
+//         FROM users
+//         WHERE id=$1;
+//       `, [routine.creatorId])
 
-        routine.activities = activities;
-        routine.creator = creator;
+//         routine.activities = activities;
+//         routine.creator = creator;
 
-        delete routine.creatorId;
+//         delete routine.creatorId;
 
-        return routine;
-    } catch (error) {
-        throw error;
-    }
-}
+//         return routine;
+//     } catch (error) {
+//         throw error;
+//     }
+// }
 
 
 async function updateRoutine(id, fields = {}) {
@@ -207,7 +137,7 @@ async function getAllRoutinesByUser({ username }) {
     `, [username])
         // console.log('this is the username', userId)
         const id = userId.id
-        const { rows: routines } = await client.query(`
+        const { rows: [routines] } = await client.query(`
     SELECT * 
     FROM routines
     WHERE "creatorId"=$1;
@@ -218,14 +148,17 @@ async function getAllRoutinesByUser({ username }) {
         throw error
     }
 }
+
 async function getPublicRoutinesByUser({ username }) {
     try {
         const { rows: [userId] } = await client.query(`
-            SELECT id
+            SELECT *
             FROM users
             WHERE username=$1;
         `, [username]);
+        console.log(userId)
         const routineId = userId.id
+        console.log('my routine id', routineId)
         const { rows: [routines] } = await client.query(`
             SELECT *
             FROM routines
@@ -236,8 +169,6 @@ async function getPublicRoutinesByUser({ username }) {
         throw error;
     }
 }
-
-
 
 
 async function getPublicRoutineByActivity({ activityId }) {
@@ -251,16 +182,13 @@ WHERE "activityId"=$1
         const { rows: routines } = await client.query(`
 SELECT id, public, name, goal
 FROM routines
-WHERE id=$1 and public=true
+WHERE id=$1;
+
 `, [id])
         return routines
     } catch (error) {
         throw error
     }
-
-
-
-
 }
 
 
@@ -278,11 +206,6 @@ async function destroyRoutine(id) {
         throw error
     }
 }
-
-
-
-
-
 //
 //
 //
@@ -317,7 +240,10 @@ async function getAllActivities() {
         throw error;
     }
 }
+
 async function updateActivity(id, fields = {}) {
+
+
     const setString = Object.keys(fields).map(
         (key, index) => `"${key}"=$${index + 1}`
     ).join(', ');
@@ -345,9 +271,36 @@ async function updateActivity(id, fields = {}) {
 }
 //
 //
-///ROUTINE_ACTIVITIES
+//ROUTINE_ACTIVITIES
 //
 //
+// async function createRoutineActivity(routineId, activityId) {
+//     try {
+
+//         await client.query(`
+//         INSERT INTO routine_activities("routineId", "activityId")
+//         VALUES ($1, $2)
+//         ON CONFLICT ("routineId", "activityId") DO NOTHING;
+//       `, [routineId, activityId]);
+
+//     } catch (error) {
+//         throw error;
+//     }
+// }
+// async function addActivitiesToRoutine(routineId, activityList) {
+//     try {
+//         console.log(activityList)
+//         const createActivitiesList = activityList.map(
+//             activity => createRoutineActivity(routineId, activity.id)
+//         );
+
+//         await Promise.all(createActivitiesList);
+
+//         return await getRoutineById(routineId);
+//     } catch (error) {
+//         throw error;
+//     }
+// }
 async function updateRoutineActivity(id, fields = {}) {
 
     const setString = Object.keys(fields).map(
@@ -393,57 +346,27 @@ async function destroyRoutineActivities(id) {
 
 
 }
-async function createRoutineActivity(routineId, activityId) {
-    try {
 
-        await client.query(`
-        INSERT INTO routine_activities("routineId", "activityId")
-        VALUES ($1, $2)
-        ON CONFLICT ("routineId", "activityId") DO NOTHING;
-      `, [routineId, activityId]);
-
-    } catch (error) {
-        throw error;
-    }
-}
-async function addActivitiesToRoutine(routineId, activityList) {
-    try {
-        console.log(activityList)
-        const createActivitiesList = activityList.map(
-            activity => createRoutineActivity(routineId, activity.id)
-        );
-
-        await Promise.all(createActivitiesList);
-
-        return await getRoutineById(routineId);
-    } catch (error) {
-        throw error;
-    }
-}
 
 
 module.exports = {
-    getAllUsers,
-    createUser,
-    updateUser,
-    createRoutine,
+
+    // createRoutine,
     getAllRoutines,
-    getRoutineById,
-    createRoutineActivity,
+    // getRoutineById,
+    // createRoutineActivity,
     createActivities,
     getAllRoutinesByUser,
-    getRoutineById,
-    addActivitiesToRoutine,
+    // getRoutineById,
+    // addActivitiesToRoutine,
     getAllActivities,
-    updateRoutineActivity,
-    destroyRoutineActivities,
-    getUser,
     updateActivity,
     destroyRoutine,
     updateRoutine,
+    updateRoutineActivity,
     getPublicRoutineByActivity,
-    getPublicRoutines,
     getPublicRoutinesByUser,
+    getPublicRoutines,
     // getPublicRoutines,
 
 }

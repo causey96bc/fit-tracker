@@ -1,84 +1,32 @@
 // const client = require('./client.js')
-// const { createActivities, addActivitiesToRoutine } = require('./activities')
-
-// async function createRoutine({ creatorId, name, goal, activities = [] }) {
+// const { createActivities } = require('./activities');
+// async function createRoutine({
+//     creatorId,
+//     name,
+//     goal,
+//     activities = []
+// }) {
+//     //await createActivities(name);
 //     try {
+//         //deconstructs the rows into post creates a query that will inside the values into the database.
 //         const { rows: [routine] } = await client.query(`
-//             INSERT INTO routines("creatorId", name, goal) 
-//             VALUES($1, $2, $3)
-//             RETURNING *;
-//         `, [creatorId, name, goal]);
-//         const activityList = await Promise.all(
-//             activities.map(activity => {
-//                 return createActivities(activity.name, activity.description);
-//             })
-//         );
-//         return addActivitiesToRoutine(routine.id, activityList);
+//       INSERT INTO routines("creatorId", name, goal) 
+//       VALUES($1, $2, $3)
+//       RETURNING *;
+//     `, [creatorId, name, goal]);
+//         //updates the tags defined in create tags it also will assign a tag Id to a post. 
+//         return routine
 //     } catch (error) {
 //         throw error;
 //     }
 // }
-
-// async function updateRoutine(routineId, fields = {}) {
-//     const { activities } = fields;
-//     delete fields.activities;
-//     const setString = Object.keys(fields).map(
-//         (key, index) => `"${key}"=$${index + 1}`
-//     ).join(', ');
-
-//     try {
-//         if (setString.length > 0) {
-//             await client.query(`
-//                 UPDATE routines
-//                 SET ${ setString}
-//                 WHERE id=${ routineId}
-//                 RETURNING *;
-//             `, Object.values(fields));
-//         }
-//         if (activities === undefined) {
-//             return await getRoutineById(routineId);
-//         }
-//         const activityList = await createActivities(name, description);
-//         const activityListIdString = activityList.map(
-//             activity => `${activity.id}`
-//         ).join(', ');
-//         await client.query(`
-//             DELETE FROM routine_activities
-//             WHERE "activityId"
-//             NOT IN (${ activityListIdString})
-//             AND "routineId"=$1;
-//       `, [routineId]);
-//         await addActivitiesToRoutine(routineId, activityList);
-//         return await getRoutineById(routineId);
-//     } catch (error) {
-//         throw error;
-//     }
-// }
-
-
-// async function getAllRoutines() {
-//     try {
-//         const { rows: routineIds } = await client.query(`
-//             SELECT id
-//             FROM routines;
-//         `);
-//         const routines = await Promise.all(routineIds.map(
-//             routine => getRoutineById(routine.id)
-//         ));
-//         return routines;
-//     } catch (error) {
-//         throw error;
-//     }
-// }
-
-
 // async function getRoutineById(routineId) {
 //     try {
 //         const { rows: [routine] } = await client.query(`
-//             SELECT *
-//             FROM routines
-//             WHERE id=$1;
-//           `, [routineId]);
+//         SELECT *
+//         FROM routines
+//         WHERE id=$1;
+//       `, [routineId]);
 //         if (!routine) {
 //             throw {
 //                 name: 'postNotFound error',
@@ -87,17 +35,17 @@
 //         }
 //         console.log('routine work...', routine)
 //         const { rows: [activities] } = await client.query(`
-//             SELECT *
-//             FROM activities
-//             JOIN routine_activities ON activities.id=routine_activities."activityId"
-//             WHERE routine_activities."routineId"=$1;
-//           `, [routineId])
+//         SELECT *
+//         FROM activities
+//         JOIN routine_activities ON activities.id=routine_activities."activityId"
+//         WHERE routine_activities."routineId"=$1;
+//       `, [routineId])
 //         console.log('please work....', activities);
 //         const { rows: [creator] } = await client.query(`
-//             SELECT id, username
-//             FROM users
-//             WHERE id=$1;
-//           `, [routine.creatorId])
+//         SELECT id, username
+//         FROM users
+//         WHERE id=$1;
+//       `, [routine.creatorId])
 
 //         routine.activities = activities;
 //         routine.creator = creator;
@@ -110,9 +58,10 @@
 //     }
 // }
 
+
+
 // module.exports = {
 //     createRoutine,
-//     updateRoutine,
-//     getAllRoutines,
-//     getRoutineById
+//     getRoutineById,
+
 // }

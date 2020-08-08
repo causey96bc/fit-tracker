@@ -1,3 +1,5 @@
+
+// const client = require('./client')
 // const { getRoutineById } = require('./routines')
 // const { createRoutineActivity } = require('./activities')
 
@@ -17,14 +19,12 @@
 //         throw error;
 //     }
 // }
-// async function updateRoutineActivity() {
-//     //code goes here
-// }
-// async function destroyRoutineActivity() {
-//     //code goes here
-// }
+// // async function updateRoutineActivity() {
+// //     //code goes here
+// // }
+// // async function destroyRoutineActivity() {
+// //     //code goes here
+// // }
 // module.exports = {
 //     addActivitiesToRoutine,
-//     updateRoutineActivity,
-//     destroyRoutineActivity
 // }
