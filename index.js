@@ -1,6 +1,6 @@
 
 require('dotenv').config()
-const { PORT = 3000 } = process.env
+const PORT = 3000;
 const express = require('express');
 const server = express();
 const bodyParser = require('body-parser')
@@ -26,7 +26,7 @@ server.use(morgan('dev'))
 
 server.use('/api', apiRouter)
 
-client.connect();
+// client.connect();
 
 server.listen(PORT, () => {
     console.log('The server is up on port', PORT)
