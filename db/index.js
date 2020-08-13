@@ -92,6 +92,23 @@ async function getUserByUsername(username) {
         throw error
     }
 }
+async function getUserById(id) {
+    try {
+        const { rows } = await client.query(`
+    SELECT *
+    FROM users
+    WHERE id=$1;
+`, [id]);
+        if (!rows || rows.length === 0) {
+            return null
+        }
+        const [user] = rows
+        return user
+    } catch (error) {
+        throw error
+    }
+}
+
 
 
 
@@ -469,6 +486,7 @@ module.exports = {
     createRoutineActivity,
     createActivities,
     getAllRoutinesByUser,
+    getUserById,
     getRoutineById,
     addActivitiesToRoutine,
     getAllActivities,

@@ -13,10 +13,10 @@ usersRouter.use((req, res, next) => {
 
 usersRouter.get('/', async (req, res) => {
     // const users = await getAllUsers();
-    const user = await getUser({ username: 'sandra' });
+    const users = await getAllUsers();
 
     res.send({
-        user, recoveredData
+        users
     });
 });
 usersRouter.post('/register', async (req, res, next) => {
