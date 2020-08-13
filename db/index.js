@@ -1,5 +1,6 @@
 
-const client = require('./client.js')
+const client = require('./client.js');
+const bcrypt = require('bcrypt');
 //
 //
 //
@@ -58,18 +59,44 @@ async function updateUser(id, fields = {}) {
     }
 }
 
-async function getUser({ username }) {
+async function getUser({ username, password }) {
     try {
-        const { rows: [user] } = await client.query(`
-            SELECT *
-            FROM users
-            WHERE username=$1
-        `, [username]);
+        const user = await getUserByUsername(username);
+        console.log('user', user)
+        if (!user) {
+            return
+        }
+        const matchingPassword = bcrypt.compareSync(password, user.password)
+        console.log(matchingPassword)
+        if (!matchingPassword) {
+            return
+        }
         return user;
     } catch (error) {
         throw error;
     }
 }
+async function getUserByUsername(username) {
+    try {
+        const { rows } = await client.query(`
+            SELECT *
+            FROM users
+            WHERE username=$1;
+        `, [username]);
+        if (!rows || rows.length === 0) {
+            return null
+        }
+        const [user] = rows
+        return user
+    } catch (error) {
+        throw error
+    }
+}
+
+
+
+
+
 //
 //Routines
 //
@@ -420,6 +447,16 @@ async function addActivitiesToRoutine(routineId, activityList) {
         throw error;
     }
 }
+async function getAllRoutineActivities() {
+    try {
+        const { rows } = await client.query(`
+            SELECT * FROM routine_activities;
+        `);
+        return rows;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 module.exports = {
@@ -442,8 +479,10 @@ module.exports = {
     destroyRoutine,
     updateRoutine,
     getPublicRoutineByActivity,
+    getUserByUsername,
     getPublicRoutines,
     getPublicRoutinesByUser,
+    getAllRoutineActivities,
     // getPublicRoutines,
 
 }
