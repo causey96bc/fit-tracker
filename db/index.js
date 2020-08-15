@@ -452,6 +452,7 @@ async function destroyRoutineActivities(id) {
     DELETE FROM routine_activities
     WHERE id=${id};
     `)
+        console.log('my destroyer...', destroy)
         return destroy
     } catch (error) {
         throw error
@@ -497,6 +498,19 @@ async function getAllRoutineActivities() {
         throw error;
     }
 }
+async function getRoutineActivityByRoutineId(routineId) {
+    try {
+        const { rows: routineActivities } = await client.query(`SELECT *
+        FROM routine_activities
+        WHERE "routineId"=$1;`
+            , [routineId]);
+        console.log('looking for database...', routineActivities)
+        return routineActivities
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 
 module.exports = {
@@ -509,6 +523,7 @@ module.exports = {
     createRoutineActivity,
     createActivities,
     getAllRoutinesByUser,
+    getRoutineActivityByRoutineId,
     getUserById,
     getRoutineById,
     addActivitiesToRoutine,

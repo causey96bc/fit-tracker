@@ -114,18 +114,8 @@ routinesRouter.post('/:routineId/activities', async (req, res, next) => {
     const activityObj = await getActivityById(req.body.activityId)
 
     console.log('get activity object....', activityObj)
-    // activityId = req.body
-    // console.log('this is the request body...', req.body)
-    // const activArr = activities
-    // const activityData = req.body
-    // if (activArr.length) {
-    //     activityData.activities = activArr;
-    // }
+
     try {
-        // console.log("getting the activitydata", activityData)
-        // console.log('looking for a name...', name)
-        // activityData.name = name;
-        // activityData.description = description;
         const addActivity = await addActivitiesToRoutine(routine.id, [activityObj])
         console.log(' looking for a added activty...', addActivity)
         res.send(addActivity)
