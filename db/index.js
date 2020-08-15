@@ -414,7 +414,7 @@ async function getActivityById(id) {
 ///ROUTINE_ACTIVITIES
 //
 //
-async function updateRoutineActivity(id, fields = {}) {
+async function updateRoutineActivity(routineId, fields = {}) {
 
     const setString = Object.keys(fields).map(
         (key, index) => `"${key}"=$${index + 1}`
@@ -434,7 +434,7 @@ async function updateRoutineActivity(id, fields = {}) {
         const { rows: [activities] } = await client.query(`
   UPDATE routine_activities
   SET ${ setString}
-  WHERE "routineId"=${ id}
+  WHERE id=${ routineId}
   RETURNING *;
 `, Object.values(fields));
         console.log(activities)
@@ -498,12 +498,12 @@ async function getAllRoutineActivities() {
         throw error;
     }
 }
-async function getRoutineActivityByRoutineId(routineId) {
+async function getRoutineActivityByRoutineId(id) {
     try {
         const { rows: routineActivities } = await client.query(`SELECT *
         FROM routine_activities
-        WHERE "routineId"=$1;`
-            , [routineId]);
+        WHERE id=$1;`
+            , [id]);
         console.log('looking for database...', routineActivities)
         return routineActivities
     } catch (error) {
