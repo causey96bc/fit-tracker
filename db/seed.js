@@ -174,61 +174,61 @@ async function rebuildDB() {
 
 async function testDB() {
     try {
-        // console.log("Starting to test database...");
+        console.log("Starting to test database...");
 
-        // console.log("Calling getAllUsers");
-        // const users = await getAllUsers();
-        // console.log("Result:", users);
+        console.log("Calling getAllUsers");
+        const users = await getAllUsers();
+        console.log("Result:", users);
 
-        // console.log('Calling getUser on users[0]');
-        // const getUserResult = await getUser({
-        //     username: 'sandra', password: '2sandy4me'
-        // });
-        // console.log('Result:', getUserResult);
+        console.log('Calling getUser on users[0]');
+        const getUserResult = await getUser({
+            username: 'sandra', password: '2sandy4me'
+        });
+        console.log('Result:', getUserResult);
 
-        // console.log("Calling updateUser on users[0]");
-        // const updateUserResult = await updateUser(users[0].id, {
-        //     username: "newname"
-        // });
-        // console.log("Result:", updateUserResult);
+        console.log("Calling updateUser on users[0]");
+        const updateUserResult = await updateUser(users[0].id, {
+            username: "newname"
+        });
+        console.log("Result:", updateUserResult);
 
         console.log('Calling getAllRoutines');
         const routines = await getAllRoutines();
         console.log('Result:', routines);
 
 
-        // console.log('calling getAllActivities');
-        // const activities = await getAllActivities();
-        // console.log('getting activities', activities[0]);
+        console.log('calling getAllActivities');
+        const activities = await getAllActivities();
+        console.log('getting activities', activities[0]);
 
-        // console.log('trying to update activities');
-        // const actupdate = await updateActivity(activities[0].id, {
-        //     name: 'new activity', description: 'this is new'
-        // });
-        // console.log('will you update?', actupdate);
-
-
-
-        // console.log('trying to update routines');
-        // const update = await updateRoutine(routines[0].id, {
-        //     public: true, name: "crunch king", goal: '500 crunches'
-        // });
-        // console.log('update workout', update)
+        console.log('trying to update activities');
+        const actupdate = await updateActivity(activities[0].id, {
+            name: 'new activity', description: 'this is new'
+        });
+        console.log('will you update?', actupdate);
 
 
 
-        // console.log('getting a public routine');
-        // const publicroute = await getPublicRoutines()
-        // console.log('get the public!!!!', publicroute)
+        console.log('trying to update routines');
+        const update = await updateRoutine(routines[0].id, {
+            public: true, name: "crunch king", goal: '500 crunches'
+        });
+        console.log('update workout', update)
 
 
-        // console.log(' get public by the user');
-        // const publicUser = await getAllRoutinesByUser({ username: 'newname' });
-        // console.log('do the damn thing', publicUser);
 
-        // console.log('get routine by activityid');
-        // const routineActivity = await getPublicRoutineByActivity({ activityId: 1 });
-        // console.log('routineactivityID......', routineActivity)
+        console.log('getting a public routine');
+        const publicroute = await getPublicRoutines()
+        console.log('get the public!!!!', publicroute)
+
+
+        console.log(' get public by the user');
+        const publicUser = await getAllRoutinesByUser({ username: 'newname' });
+        console.log('do the damn thing', publicUser);
+
+        console.log('get routine by activityid');
+        const routineActivity = await getPublicRoutineByActivity({ activityId: 1 });
+        console.log('routineactivityID......', routineActivity)
 
 
         // // console.log('get public routines')

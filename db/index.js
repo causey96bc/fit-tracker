@@ -173,20 +173,20 @@ async function getRoutineById(routineId) {
             }
         }
         console.log('routine work...', routine)
-        const { rows: [activities] } = await client.query(`
+        const { rows } = await client.query(`
         SELECT *
         FROM activities
         JOIN routine_activities ON activities.id=routine_activities."activityId"
         WHERE routine_activities."routineId"=$1;
       `, [routineId])
-        console.log('please work....', activities);
+        console.log('please work....', rows);
         const { rows: [creator] } = await client.query(`
         SELECT id, username
         FROM users
         WHERE id=$1;
       `, [routine.creatorId])
 
-        routine.activities = activities;
+        routine.activities = rows;
         routine.creator = creator;
 
         delete routine.creatorId;
@@ -198,7 +198,7 @@ async function getRoutineById(routineId) {
 }
 
 
-async function updateRoutine(id, fields = {}) {
+async function updateRoutine(routineId, fields = {}) {
 
     const setString = Object.keys(fields).map(
         (key, index) => `"${key}"=$${index + 1}`
@@ -215,7 +215,7 @@ async function updateRoutine(id, fields = {}) {
         const { rows: [routine] } = await client.query(`
   UPDATE routines
   SET ${ setString}
-  WHERE "creatorId"=${ id}
+  WHERE id=${ routineId}
   RETURNING *;
 `, Object.values(fields));
 
@@ -387,6 +387,28 @@ async function updateActivity(id, fields = {}) {
     }
 
 }
+
+async function getActivityById(id) {
+    try {
+        const { rows } = await client.query(`
+    SELECT *
+    FROM activities
+    WHERE id=$1;
+`, [id]);
+        if (!rows || rows.length === 0) {
+            return null
+        }
+        const [activities] = rows
+        return activities
+    } catch (error) {
+        throw error
+    }
+}
+
+
+
+
+
 //
 //
 ///ROUTINE_ACTIVITIES
@@ -452,10 +474,11 @@ async function createRoutineActivity(routineId, activityId) {
 }
 async function addActivitiesToRoutine(routineId, activityList) {
     try {
-        console.log(activityList)
+        console.log('activitylist.....', activityList)
         const createActivitiesList = activityList.map(
             activity => createRoutineActivity(routineId, activity.id)
         );
+        console.log('createdactivitylist....', createActivitiesList)
 
         await Promise.all(createActivitiesList);
 
@@ -494,6 +517,7 @@ module.exports = {
     destroyRoutineActivities,
     getUser,
     updateActivity,
+    getActivityById,
     destroyRoutine,
     updateRoutine,
     getPublicRoutineByActivity,
